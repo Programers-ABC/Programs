@@ -1,0 +1,149 @@
+show dbs --> mirar las base de datos
+show collections --> mirar las tablas(colecciones)
+use [name db] --> crear una base de datos pero aparecera hasta que se le inserte datos
+db.[coleccion].insert( [document json] ); --> crea e inserta datos en la tabla(coleccion)
+db.[coleccion].save( {Autor:"Miguel de Cervantes",Titulo:"El Quijote",Year:"1605"} ); --> crea e inserta datos en la tabla(coleccion)
+db.[coleccion].find(); --> mirar los datos de la tabla(coleccion)
+			  .find( {Autor: "Carl Sagan"} );
+			  .findOne({age:34},{name:"Juan"}); --> busca datos pero 
+db.[coleccion].find().pretty(); --> muestra de manera mas bonita los datos de la tabla(coleccion)
+db.[coleccion].update ( {Autor:"Carl Sagan"},{$set:{Year:"1999"}} ); --> actualizar
+db.[coleccion].remove( {Autor: "Juan"} ); --> eliminar un solo dato
+db.[coleccion].remove( {} ); --> eliminar todo
+db.help() --> ayuda
+
+aggregate --> Realiza tareas de agregación , como un grupo, utilizando el marco de agregación.
+count --> Cuenta el número de documentos en una colección o una vista.
+distinct --> Muestra los valores distintos encontrados para una clave especificada en una colección o una vista.
+group --> Obsoleta . Agrupa los documentos en una colección por la clave especificada y realiza una agregación simple.
+mapReduce --> Realiza la agregación de reducción de mapa para grandes conjuntos de datos.
+
+mongodb cloud ->  user: arjiseyer97@gmail.com  psw: @arji1234
+mongodb+srv://Arji:arji1234@mongodb-gsm4j.mongodb.net/admin
+mongodb://Arji:arji1234@mongodb-shard-00-00-gsm4j.mongodb.net:27017,mongodb-shard-00-01-gsm4j.mongodb.net:27017,mongodb-shard-00-02-gsm4j.mongodb.net:27017/admin?replicaSet=MongoDB-shard-0&ssl=true
+https://www.youtube.com/watch?v=es9m6LFK6DI
+
+public class ConectarConMongoDB {
+ 
+	public static void main(String[] args) {
+ 
+		MongoClient mongo = null;
+		MongoDatabase db = null;
+		MongoCollection<Document> collection = null;
+		MongoCursor<Document> cursor = null;
+		Set<String> keys = null;
+ 
+		//Conectar con MongoDB
+		mongo = CrearConexion();
+ 
+		//OK
+		if (mongo !=null){
+ 
+			//Abrir Base de Datos
+			db = AbrirBaseDeDatos(mongo);
+ 
+			//Abrir Coleccion
+			collection = AbrirColeccion(db);
+ 
+			//Setea cursor
+			cursor = collection.find().iterator();
+ 
+ 
+			while (cursor.hasNext())
+            {
+            	Document doc = cursor.next();
+            	keys = doc.keySet();
+ 
+            	ScanIntoDocument(doc, keys, false);
+            	System.out.println("\n");
+            }
+ 
+		}else {
+            System.out.println("Error: Conexión no establecida");
+		}
+	}
+ 
+	/**
+	 * CrearConexion
+	 * @return
+	 */
+    private static MongoClient CrearConexion() {
+ 
+        MongoClient mongo = null;
+ 
+        try {
+            mongo = new MongoClient("localhost", 27017);
+ 
+        } catch (Exception e) {
+            e.printStackTrace();}
+ 
+        return mongo;
+    }
+ 
+    /**
+     * AbrirBaseDeDatos
+     * @param mongo
+     * @return
+     */
+    private static MongoDatabase AbrirBaseDeDatos(MongoClient mongo){
+ 
+    	return mongo.getDatabase("Nombre_de_la_DB");
+    }
+ 
+    /**
+     * AbrirColeccion
+     * @param db
+     * @return
+     */
+    private static MongoCollection<Document> AbrirColeccion(MongoDatabase db){
+ 
+    	return db.getCollection("Nombre_de_la_Coleccion");
+    }
+ 
+    /**
+     * ScanIntoDocument
+     * @param doc
+     * @param keys
+     * @param tab
+     */
+    private static void ScanIntoDocument(Document doc, Set<String> keys, boolean tab){
+ 
+    	Integer Numero;
+ 
+    	for (String key : keys){
+    		Object ob = doc.get(key);
+ 
+    		if (ob.getClass() == Document.class) {
+    			Set<String> OneKeys = null;
+    			Document OneDoc = (Document) doc.get(key);
+    			OneKeys = OneDoc.keySet();
+ 
+    			System.out.println(key + ": ");
+ 
+    			ScanIntoDocument(OneDoc, OneKeys, true);
+ 
+    		} else if (ob.getClass() == Double.class){
+    			Double Ndoble = doc.getDouble(key);
+    			Numero = Ndoble.intValue();
+    			if (tab){
+    	    		System.out.println("\t" + key + ": " + Numero.toString());
+    	    	} else{
+    			System.out.println(key + ": " + Numero.toString());
+    	    	}
+ 
+    		} else{
+    			if (tab){
+    	    		System.out.println("\t" + key + ": " + doc.get(key).toString());
+    	    	} else{
+    			System.out.println(key + ": " + doc.get(key).toString());
+    	    	}
+    		}
+    	}
+    }
+    //
+}
+
+RegistroTemperatura
+Arduino
+Arduino_Configuracion
+Conexion
